@@ -7,32 +7,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-<!-- ══ FIREBASE SDK ══ -->
 <script>
-// ╔══════════════════════════════════════════╗
-// ║  🔥 PON AQUÍ TUS CREDENCIALES FIREBASE  ║
-// ╚══════════════════════════════════════════╝
 window.FIREBASE_CONFIG = {
-  apiKey:            "TU_API_KEY",
-  authDomain:        "tu-proyecto.firebaseapp.com",
-  projectId:         "tu-proyecto-id",
-  storageBucket:     "tu-proyecto.appspot.com",
-  messagingSenderId: "123456789012",
-  appId:             "1:123456789012:web:abcdef123456"
+  apiKey:            "AIzaSyDu8IO7bnBVNSHe6aFWVbwBdoh4YaypXIU",
+  authDomain:        "monumento-identidad.firebaseapp.com",
+  projectId:         "monumento-identidad",
+  storageBucket:     "monumento-identidad.firebasestorage.app",
+  messagingSenderId: "737820765749",
+  appId:             "1:737820765749:web:1c4d0b947568f982c88b7c",
+  measurementId:     "G-PXEV5EKSLM"
 };
 
-// Si las credenciales son falsas (placeholder), NO intentar conectar Firebase
-const _isFakeConfig = window.FIREBASE_CONFIG.apiKey === "TU_API_KEY";
+const _isFakeConfig = false;
 window._fbReady = false;
 
 if (!_isFakeConfig) {
-  // Solo cargar Firebase si hay credenciales reales
   const s = document.createElement('script');
   s.type = 'module';
   s.textContent = `
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs }
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs, updateDoc, doc, deleteDoc }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytesResumable, getDownloadURL }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
@@ -41,7 +37,7 @@ if (!_isFakeConfig) {
       const db  = getFirestore(app);
       const storage = getStorage(app);
       window._fb = { db, storage, collection, addDoc, onSnapshot, query, orderBy,
-                     serverTimestamp, getDocs, ref, uploadBytesResumable, getDownloadURL };
+                     serverTimestamp, getDocs, ref, uploadBytesResumable, getDownloadURL, updateDoc, doc, deleteDoc };
       window._fbReady = true;
       console.log("✅ Firebase conectado");
     } catch(e) {
@@ -79,14 +75,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 button{cursor:pointer;font-family:var(--font-b);border:none;outline:none}
 input,select,textarea{font-family:var(--font-b);outline:none}
 
-/* ── SCROLLBARS ── */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
 
-/* ══════════════════════════════════════
-   VISTA 1: FORMULARIO
-══════════════════════════════════════ */
+/* ═════ VISTA 1: FORMULARIO ═════ */
 #view-form{
   position:fixed;inset:0;z-index:50;
   display:flex;align-items:center;justify-content:center;
@@ -139,16 +132,12 @@ input,select,textarea{font-family:var(--font-b);outline:none}
 .btn-primary:hover{background:#d06a4f}
 .btn-primary:active{transform:scale(.98)}
 
-/* ══════════════════════════════════════
-   VISTA 2: FEED (red social)
-══════════════════════════════════════ */
+/* ═════ VISTA 2: FEED ═════ */
 #view-feed{
   position:fixed;inset:0;z-index:40;
   display:flex;flex-direction:column;
   background:var(--bg);
 }
-
-/* FEED TOP BAR */
 .feed-topbar{
   position:absolute;top:0;left:0;right:0;z-index:20;
   padding:.9rem 1rem .5rem;
@@ -162,27 +151,18 @@ input,select,textarea{font-family:var(--font-b);outline:none}
   border-bottom:2px solid transparent;transition:.2s;
 }
 .feed-tab.active{color:var(--text);border-color:var(--accent)}
-.feed-notif{
-  width:36px;height:36px;background:var(--surface);
-  border:1px solid var(--border);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.9rem;color:var(--text);
-}
 
-/* SCROLL DE POSTS (TikTok style) */
 .posts-scroll{
   height:100%;overflow-y:scroll;overflow-x:hidden;
   scroll-snap-type:y mandatory;scrollbar-width:none;
 }
 .posts-scroll::-webkit-scrollbar{display:none}
-
-/* CADA POST */
 .post-item{
   height:100dvh;width:100%;
   position:relative;scroll-snap-align:start;
   overflow:hidden;background:#000;
 }
-.post-media{width:100%;height:100%;object-fit:cover;display:block}
+.post-media{width:100%;height:100%;object-fit:contain;display:block;background-color:#000;}
 .post-media-placeholder{
   width:100%;height:100%;
   background:linear-gradient(135deg,#1c2f26 0%,#2d1a12 50%,#0a0a0a 100%);
@@ -194,8 +174,6 @@ input,select,textarea{font-family:var(--font-b);outline:none}
   background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.1) 55%,transparent 100%);
   pointer-events:none;
 }
-
-/* ACCIONES DERECHA */
 .post-actions{
   position:absolute;right:12px;bottom:90px;z-index:5;
   display:flex;flex-direction:column;align-items:center;gap:20px;
@@ -211,8 +189,6 @@ input,select,textarea{font-family:var(--font-b);outline:none}
 .act-icon:hover{background:var(--accent);border-color:var(--accent)}
 .act-icon.ai-btn{border-color:var(--accent);box-shadow:0 0 14px rgba(224,122,95,.35)}
 .act-count{font-size:.7rem;font-weight:600;color:rgba(255,255,255,.85)}
-
-/* INFO IZQUIERDA */
 .post-info{
   position:absolute;bottom:24px;left:14px;right:70px;z-index:5;
 }
@@ -226,8 +202,6 @@ input,select,textarea{font-family:var(--font-b);outline:none}
   padding:4px 10px;border-radius:8px;
   font-size:.7rem;font-weight:600;color:rgba(255,255,255,.9);
 }
-
-/* SPINNER CARGA */
 .post-loading{
   height:100dvh;display:flex;align-items:center;justify-content:center;
   flex-direction:column;gap:12px;color:var(--muted);
@@ -235,9 +209,7 @@ input,select,textarea{font-family:var(--font-b);outline:none}
 .spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ══════════════════════════════════════
-   CHAT IA
-══════════════════════════════════════ */
+/* ═════ CHAT IA ═════ */
 #chat-panel{
   position:fixed;inset-x:0;bottom:0;z-index:60;
   height:72dvh;
@@ -297,9 +269,7 @@ input,select,textarea{font-family:var(--font-b);outline:none}
 }
 .chat-send:hover{background:#d06a4f}
 
-/* ══════════════════════════════════════
-   ADMIN LOGIN MODAL
-══════════════════════════════════════ */
+/* ═════ ADMIN LOGIN ═════ */
 #admin-modal{
   position:fixed;inset:0;z-index:80;
   background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
@@ -325,178 +295,246 @@ input,select,textarea{font-family:var(--font-b);outline:none}
 }
 .btn-white:hover{background:#fff}
 
-/* ══════════════════════════════════════
-   VISTA 3: ADMIN DASHBOARD
-══════════════════════════════════════ */
+
+/* ═════ VISTA 3: ADMIN DASHBOARD (DISEÑO ÉPICO) ═════ */
 #view-admin{
   position:fixed;inset:0;z-index:70;
-  display:flex;flex-direction:column;background:var(--bg);
+  display:flex;flex-direction:column;
+  background: radial-gradient(circle at 50% 0%, #1a0f0c 0%, var(--bg) 70%);
 }
 .admin-sidebar{
-  position:fixed;left:0;top:0;bottom:0;width:240px;z-index:10;
-  background:var(--surface);border-right:1px solid var(--border);
+  position:fixed;left:0;top:0;bottom:0;width:250px;z-index:10;
+  background:rgba(20,20,20,0.65); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-right:1px solid rgba(255,255,255,0.05);
   display:flex;flex-direction:column;padding:1.5rem 1rem;
   transform:translateX(-100%);transition:transform .3s;
+  box-shadow: 5px 0 30px rgba(0,0,0,0.5);
 }
 .admin-sidebar.open{transform:none}
 .admin-sidebar-logo{
   display:flex;align-items:center;gap:.65rem;margin-bottom:2rem;padding:.5rem .25rem;
 }
-.admin-sidebar-logo span{font-family:var(--font-h);font-size:1.1rem;font-weight:800}
+.admin-sidebar-logo span{font-family:var(--font-h);font-size:1.1rem;font-weight:800; color:var(--text);}
 .nav-item{
   display:flex;align-items:center;gap:.7rem;
-  padding:.7rem .8rem;border-radius:var(--r);
-  font-size:.9rem;font-weight:500;color:var(--muted);
-  cursor:pointer;transition:.2s;margin-bottom:2px;
+  padding:.8rem .9rem;border-radius:12px;
+  font-size:.9rem;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all .3s ease;margin-bottom:4px;
 }
-.nav-item:hover{background:var(--panel);color:var(--text)}
-.nav-item.active{background:rgba(224,122,95,.15);color:var(--accent)}
-.nav-item i{width:18px;text-align:center}
-.sidebar-sep{height:1px;background:var(--border);margin:.75rem 0}
+.nav-item:hover{background:rgba(255,255,255,0.03);color:var(--text)}
+.nav-item.active{
+  background:linear-gradient(90deg, rgba(224,122,95,0.15) 0%, transparent 100%);
+  border-left: 3px solid var(--accent);
+  color:var(--accent);
+  box-shadow: inset 5px 0 10px rgba(224,122,95,0.05);
+}
+.nav-item i{width:20px;text-align:center; font-size: 1.1rem;}
+.sidebar-sep{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);margin:1rem 0}
+
 .admin-main{
   flex:1;overflow-y:auto;
-  padding:1rem;padding-bottom:2rem;
+  padding:1.5rem;padding-bottom:3rem;
 }
 .admin-topbar{
   display:flex;align-items:center;gap:.75rem;
-  padding:.75rem 1rem;background:var(--surface);
-  border-bottom:1px solid var(--border);
+  padding:1rem 1.5rem;
+  background:rgba(20,20,20,0.65); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.05);
   position:sticky;top:0;z-index:5;
 }
-.admin-topbar h2{font-family:var(--font-h);font-size:1.1rem;font-weight:700;flex:1;margin-left:.25rem}
-.hamburger{background:none;border:none;color:var(--text);font-size:1.2rem;padding:.25rem}
-.logout-btn{
-  display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
-  font-size:.8rem;color:var(--muted);
+.admin-topbar h2{
+  font-family:var(--font-h);font-size:1.2rem;font-weight:800;flex:1;margin-left:.25rem;
+  background: linear-gradient(to right, var(--gold), var(--accent));
+  -webkit-background-clip: text; color: transparent; text-transform: uppercase; letter-spacing: 1px;
 }
+.hamburger{background:none;border:none;color:var(--text);font-size:1.4rem;padding:.25rem}
+.logout-btn{
+  display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  font-size:.85rem;font-weight:600;color:var(--muted); transition:.2s;
+}
+.logout-btn:hover{background:var(--border);color:var(--text);}
 
-/* TABS ADMIN */
-.admin-tabs{display:flex;gap:.5rem;margin-bottom:1.25rem;overflow-x:auto;padding-bottom:.25rem}
+.admin-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;overflow-x:auto;padding-bottom:.25rem}
 .admin-tabs::-webkit-scrollbar{display:none}
 .admin-tab{
-  padding:.45rem .9rem;border-radius:99px;font-size:.82rem;font-weight:600;
+  padding:.55rem 1.2rem;border-radius:99px;font-size:.85rem;font-weight:700;
   background:var(--panel);border:1px solid var(--border);color:var(--muted);
-  white-space:nowrap;transition:.2s;
+  white-space:nowrap;transition:all .3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
-.admin-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.admin-tab:hover{border-color:rgba(255,255,255,0.2); color:var(--text);}
+.admin-tab.active{background:var(--accent);color:#fff;border-color:var(--accent); box-shadow: 0 5px 15px rgba(224,122,95,0.3);}
 
-/* KPIs */
-.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;margin-bottom:1.25rem}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem .9rem}
-.kpi-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;margin-bottom:.35rem}
-.kpi-value{font-family:var(--font-h);font-size:1.75rem;font-weight:800}
-.kpi-value.accent{color:var(--accent)}
-.kpi-sub{font-size:.75rem;color:var(--muted);margin-top:2px}
+.kpi-grid{display:grid;gap:1rem;margin-bottom:1.5rem}
+.kpi-card{
+  background: linear-gradient(145deg, rgba(30,30,30,0.8) 0%, rgba(15,15,15,0.9) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-top: 2px solid var(--accent);
+  border-radius: 16px; padding: 1.25rem 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  text-align: center; position: relative; overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s;
+}
+.kpi-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(224,122,95,0.15);
+  border-top-color: var(--gold);
+}
+.kpi-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:.5rem}
+.kpi-value{font-family:var(--font-h);font-size:1.8rem;font-weight:800; text-shadow: 0 0 15px rgba(255,255,255,0.05);}
+.kpi-value.accent{color:var(--accent); text-shadow: 0 0 20px rgba(224,122,95,0.4); font-size: 2rem;}
+.kpi-sub{font-size:.7rem;color:var(--muted);margin-top:4px}
 
-/* CHARTS */
 .chart-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:1.1rem;margin-bottom:.9rem;
+  background: linear-gradient(145deg, rgba(25,25,25,0.7) 0%, rgba(15,15,15,0.8) 100%);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 20px; padding: 1.5rem; margin-bottom: 1.2rem;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
 }
-.chart-title{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem}
-.chart-wrap{position:relative;height:200px}
+.chart-title{font-family:var(--font-h);font-size:.9rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem; display:flex; align-items:center; gap:8px;}
+.chart-wrap{position:relative;height:240px}
 
-/* TABLA FRECUENCIAS */
-.freq-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.freq-table th{text-align:left;padding:.65rem .75rem;font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border)}
-.freq-table td{padding:.65rem .75rem;border-bottom:1px solid rgba(255,255,255,.04)}
-.freq-table tr:last-child td{border-bottom:none}
-.freq-pct{color:var(--accent);font-weight:700}
-.pct-bar-wrap{height:4px;background:var(--panel);border-radius:99px;overflow:hidden;margin-top:3px}
-.pct-bar{height:100%;background:var(--accent);border-radius:99px;transition:width .5s}
+.freq-table{width:100%;border-collapse:separate; border-spacing: 0; font-size:.85rem}
+.freq-table th{text-align:left;padding:.8rem 1rem;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 8px 8px 0 0;}
+.freq-table td{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.03); transition: background 0.2s;}
+.freq-table tr:hover td { background: rgba(224,122,95,0.05); }
+.freq-pct{color:var(--accent);font-weight:800; font-family:var(--font-h);}
+.pct-bar-wrap{height:6px;background:rgba(0,0,0,0.3);border-radius:99px;overflow:hidden;margin-top:6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);}
+.pct-bar{height:100%;background:linear-gradient(90deg, var(--accent), var(--gold));border-radius:99px;transition:width 1s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 0 10px rgba(224,122,95,0.5);}
 
-/* CRUCE DE VARIABLES */
-.cruce-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.85rem}
-.cruce-tab{padding:.35rem .7rem;font-size:.75rem;font-weight:600;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--muted);transition:.2s}
-.cruce-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cruce-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.cruce-tab{padding:.4rem .9rem;font-size:.8rem;font-weight:700;background:var(--panel);border:1px solid var(--border);border-radius:10px;color:var(--muted);transition:all .3s ease;}
+.cruce-tab:hover{border-color:rgba(255,255,255,0.2);}
+.cruce-tab.active{background:var(--accent);color:#fff;border-color:var(--accent); box-shadow: 0 4px 12px rgba(224,122,95,0.25);}
 
-/* SIMULADOR */
+/* SIMULADOR MODIFICADO */
 .sim-box{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:1rem;margin-bottom:.9rem;
+  background: linear-gradient(145deg, rgba(28,28,28,0.8) 0%, rgba(20,20,20,0.9) 100%);
+  border:1px solid rgba(255,255,255,0.05);border-radius:20px;
+  padding:1.5rem;margin-bottom:1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
-.sim-box label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;display:block;margin-bottom:.5rem}
-.sim-row{display:flex;gap:.5rem}
-.sim-input{
-  flex:1;background:var(--bg);border:1px solid var(--border);
-  color:var(--text);border-radius:var(--r);padding:.7rem .85rem;font-size:.9rem;
-}
+.sim-box label.sim-title{font-family:var(--font-h);font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);font-weight:800;display:block;margin-bottom:1.2rem; display:flex; align-items:center; gap:8px;}
 .sim-btn{
-  padding:.7rem 1rem;background:var(--accent);color:#fff;
-  border-radius:var(--r);font-weight:700;font-size:.85rem;white-space:nowrap;
+  padding:.8rem 1.2rem;background:linear-gradient(135deg, var(--accent) 0%, #d06a4f 100%);color:#fff;
+  border-radius:12px;font-weight:800;font-family:var(--font-h);font-size:.9rem;letter-spacing: 0.5px;
+  box-shadow: 0 5px 15px rgba(224,122,95,0.3); transition: transform 0.2s, box-shadow 0.2s;
 }
+.sim-btn:hover{transform: translateY(-2px); box-shadow: 0 8px 20px rgba(224,122,95,0.4);}
+.sim-btn:active{transform: translateY(0);}
+.sim-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.sim-field label { font-size: 0.7rem; color: var(--text); font-weight:600; margin-bottom: 0.4rem; display: block; opacity:0.8;}
+.sim-input{
+  flex:1; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border);
+  color:var(--text);border-radius:10px;padding:.8rem 1rem;font-size:.95rem; font-family:var(--font-b);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.sim-input:focus{border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(129,178,154,0.15);}
 
-/* GESTOR DE CONTENIDO */
 .post-admin-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);margin-bottom:.65rem;overflow:hidden;
+  background:rgba(25,25,25,0.6);border:1px solid rgba(255,255,255,0.05);
+  border-radius:16px;margin-bottom:.8rem;overflow:hidden; backdrop-filter:blur(10px);
+  transition: transform 0.2s;
 }
-.pac-header{display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem}
+.post-admin-card:hover{transform: translateX(4px); border-color:rgba(255,255,255,0.1);}
+.pac-header{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem}
 .pac-thumb{
-  width:52px;height:52px;object-fit:cover;border-radius:8px;background:var(--panel);
-  display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--muted);flex-shrink:0;
+  width:56px;height:56px;object-fit:cover;border-radius:12px;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--muted);flex-shrink:0;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 .pac-info{flex:1;min-width:0}
-.pac-title{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pac-meta{font-size:.75rem;color:var(--muted);margin-top:2px}
+.pac-title{font-family:var(--font-h); font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; color:var(--text);}
+.pac-meta{font-size:.75rem;color:var(--muted);margin-top:4px}
 .pac-badge{
-  padding:3px 8px;border-radius:6px;font-size:.65rem;font-weight:700;text-transform:uppercase;
+  padding:4px 10px;border-radius:8px;font-size:.65rem;font-weight:800;text-transform:uppercase; letter-spacing: 0.5px;
 }
-.badge-foto{background:rgba(129,178,154,.15);color:var(--accent2)}
-.badge-video{background:rgba(224,122,95,.15);color:var(--accent)}
-.badge-info{background:rgba(242,204,143,.15);color:var(--gold)}
-.pac-actions{display:flex;gap:.5rem;padding:0 1rem .75rem}
+.badge-foto{background:rgba(129,178,154,.15);color:var(--accent2); border: 1px solid rgba(129,178,154,.3);}
+.badge-video{background:rgba(224,122,95,.15);color:var(--accent); border: 1px solid rgba(224,122,95,.3);}
+.badge-info{background:rgba(242,204,143,.15);color:var(--gold); border: 1px solid rgba(242,204,143,.3);}
+.pac-actions{display:flex;gap:.75rem;padding:0 1.25rem 1rem}
 .pac-btn{
-  padding:.4rem .75rem;border-radius:8px;font-size:.78rem;font-weight:600;border:1px solid var(--border);
-  background:var(--panel);color:var(--muted);transition:.2s;
+  padding:.5rem .9rem;border-radius:10px;font-size:.8rem;font-weight:700;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);transition:all .2s ease; cursor:pointer; display:flex; align-items:center; gap:6px;
 }
-.pac-btn:hover{background:var(--border);color:var(--text)}
+.pac-btn:hover{background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.2);}
 .pac-btn.danger{border-color:rgba(248,113,113,.3);color:#f87171}
-.pac-btn.danger:hover{background:rgba(248,113,113,.1)}
+.pac-btn.danger:hover{background:rgba(248,113,113,.1); border-color:#f87171;}
 
-/* UPLOAD FORM */
 .upload-zone{
-  border:2px dashed var(--border);border-radius:var(--r);
-  padding:2rem 1rem;text-align:center;transition:.2s;cursor:pointer;
-  margin-bottom:1rem;
+  border:2px dashed var(--border);border-radius:20px;
+  padding:3rem 1.5rem;text-align:center;transition:all .3s ease;cursor:pointer;
+  margin-bottom:1.25rem; background: rgba(0,0,0,0.2);
 }
-.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:rgba(224,122,95,.05)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:rgba(224,122,95,.05); transform:scale(1.01);}
 .upload-zone input{display:none}
-.upload-icon{font-size:2rem;color:var(--muted);margin-bottom:.5rem}
-.upload-text{font-size:.85rem;color:var(--muted)}
-.upload-text strong{color:var(--accent)}
-.progress-bar{height:4px;background:var(--panel);border-radius:99px;margin:.75rem 0;overflow:hidden}
-.progress-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .3s;width:0%}
+.upload-icon{font-size:2.5rem;color:var(--accent);margin-bottom:.75rem; filter: drop-shadow(0 0 10px rgba(224,122,95,0.4));}
+.upload-text{font-size:.9rem;color:var(--text); font-weight:500;}
+.upload-text strong{color:var(--accent); font-weight:800;}
 
-/* VISITANTES TABLE */
-.visits-table{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);overflow:hidden;
+/* NUEVOS ESTILOS TABLA VISITANTES (DISEÑO IMAGEN) */
+.visits-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
-.vt-row{
-  display:grid;grid-template-columns:1fr 1fr 1fr auto;
-  align-items:center;gap:.5rem;padding:.65rem 1rem;
-  border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem;
+.vt-row {
+  display: grid;
+  /* 6 Columnas + 1 pequeña para el botón de eliminar */
+  grid-template-columns: 90px 90px 1.5fr 1.2fr 1.5fr 1fr 40px;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  color: var(--text);
 }
-.vt-row:last-child{border-bottom:none}
-.vt-header{background:var(--panel);font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
-.vt-dot{width:7px;height:7px;background:var(--accent2);border-radius:50%}
+.vt-row:hover { background: rgba(255,255,255,0.02); }
+.vt-row:last-child { border-bottom: none; }
+.vt-header {
+  background: rgba(0,0,0,0.4);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 800;
+  border-bottom: 2px solid rgba(255,255,255,0.08);
+}
+.vt-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#visits-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+#visits-body::-webkit-scrollbar { width: 6px; }
+#visits-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+#visits-body::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* RESPONSIVE ADMIN */
+@media(max-width: 768px) {
+  .sim-grid { grid-template-columns: repeat(2, 1fr); }
+  .vt-row { grid-template-columns: 80px 1fr 1fr 40px; font-size: 0.75rem; gap: 0.5rem; }
+  .vt-header span:nth-child(2), .vt-header span:nth-child(4), .vt-header span:nth-child(6),
+  .vt-cell:nth-child(2), .vt-cell:nth-child(4), .vt-cell:nth-child(6) { display: none; }
+}
 @media(min-width:768px){
   .admin-sidebar{position:sticky;transform:none;display:flex}
   #view-admin{flex-direction:row}
   .hamburger{display:none}
   .admin-main-wrap{flex:1;overflow-y:auto;display:flex;flex-direction:column}
   .admin-topbar{position:sticky;top:0}
-  .kpi-grid{grid-template-columns:repeat(4,1fr)}
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════ VISTA 1: FORMULARIO ══════════════ -->
 <section id="view-form" class="fade">
   <div class="form-bg"></div>
   <div class="form-card" id="secret-hold">
@@ -521,8 +559,10 @@ input,select,textarea{font-family:var(--font-b);outline:none}
         <label>Procedencia</label>
         <select id="f-proc" required>
           <option value="" disabled selected>¿De dónde nos visitas?</option>
-          <option>Riohacha</option><option>La Guajira</option>
-          <option>Colombia</option><option>Extranjero</option>
+          <option>Riohacha</option>
+          <option>Otro municipio de La Guajira</option>
+          <option>Otro departamento de Colombia</option>
+          <option>Extranjero</option>
         </select>
       </div>
       <div class="field">
@@ -540,14 +580,30 @@ input,select,textarea{font-family:var(--font-b);outline:none}
   </div>
 </section>
 
-<!-- ══════════════ VISTA 2: FEED ══════════════ -->
 <section id="view-feed" class="hidden">
   <div class="feed-topbar">
     <div class="feed-tabs">
       <button class="feed-tab" onclick="switchFeedTab('historia',this)">Historia</button>
       <button class="feed-tab active" onclick="switchFeedTab('feed',this)">Para Ti</button>
     </div>
-    <button class="feed-notif" onclick="openAdminModal()"><i class="fa-solid fa-shield-halved"></i></button>
+  </div>
+
+  <div id="public-stats-banner" style="display: none; position: absolute; top: 60px; left: 1rem; right: 1rem; z-index: 15; background: rgba(28,28,28,0.85); backdrop-filter: blur(10px); border: 1px solid var(--accent); border-radius: 12px; padding: 1rem; flex-direction: column; gap: 0.5rem; transition: opacity 0.5s;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="font-family: var(--font-h); font-size: 1rem; color: var(--gold); margin: 0;">¡Bienvenido a Riohacha!</h3>
+      <button onclick="document.getElementById('public-stats-banner').style.display='none'" style="background: none; color: var(--muted); border: none; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p style="font-size: 0.8rem; color: var(--text); margin: 0; line-height: 1.4;">Riohacha, el "Portal de Perlas", te recibe. Estás explorando el Monumento a la Identidad en nuestro hermoso malecón Caribe.</p>
+    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+      <div style="flex: 1; background: rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 8px; text-align: center;">
+        <span style="font-size: 0.65rem; color: var(--muted); text-transform: uppercase;">Visitantes Totales</span>
+        <div style="font-family: var(--font-h); font-size: 1.2rem; font-weight: bold; color: var(--accent);" id="public-total-visits">0</div>
+      </div>
+      <div style="flex: 1; background: rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 8px; text-align: center;">
+        <span style="font-size: 0.65rem; color: var(--muted); text-transform: uppercase;">Perfil Mayoritario</span>
+        <div style="font-family: var(--font-h); font-size: 1.2rem; font-weight: bold; color: var(--accent2);" id="public-top-profile">Turista</div>
+      </div>
+    </div>
   </div>
 
   <div class="posts-scroll" id="posts-scroll">
@@ -558,7 +614,6 @@ input,select,textarea{font-family:var(--font-b);outline:none}
   </div>
 </section>
 
-<!-- ══════════════ CHAT IA ══════════════ -->
 <div class="chat-backdrop" id="chat-backdrop" onclick="closeChat()"></div>
 <div id="chat-panel">
   <div class="chat-inner">
@@ -570,7 +625,7 @@ input,select,textarea{font-family:var(--font-b);outline:none}
           <h3>Guía Virtual IA</h3>
           <div style="display:flex;align-items:center;gap:5px;margin-top:1px">
             <div class="chat-status"></div>
-            <span style="font-size:.72rem;color:var(--muted)">Claude · Identidad</span>
+            <span style="font-size:.72rem;color:var(--muted)">Guía · Identidad</span>
           </div>
         </div>
       </div>
@@ -580,20 +635,19 @@ input,select,textarea{font-family:var(--font-b);outline:none}
       <div class="msg-row ai">
         <div class="msg-avatar"><i class="fa-solid fa-robot" style="font-size:.85rem"></i></div>
         <div class="msg-bubble">
-          ¡Hola! Soy tu guía virtual del Monumento a la Identidad. Conozco la historia, el significado cultural y los datos estadísticos de este lugar. ¿Qué deseas saber? 🌵
+          ¡Hola! Soy tu guía virtual del Monumento a la Identidad en Riohacha. Conozco la historia de nuestros próceres como José Prudencio Padilla, la geografía guajira y las estadísticas en tiempo real de nuestra app. ¿Qué deseas saber?
         </div>
       </div>
     </div>
     <div class="chat-footer">
       <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="Pregunta sobre el monumento…" onkeydown="if(event.key==='Enter')sendChat()">
+        <input type="text" id="chat-input" placeholder="Pregunta sobre el monumento o Riohacha…" onkeydown="if(event.key==='Enter')sendChat()">
         <button class="chat-send" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ ADMIN MODAL LOGIN ══════════════ -->
 <div id="admin-modal" class="hidden fade">
   <div class="admin-card">
     <button class="admin-card-close" onclick="closeAdminModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -608,10 +662,24 @@ input,select,textarea{font-family:var(--font-b);outline:none}
   </div>
 </div>
 
-<!-- ══════════════ VISTA 3: ADMIN DASHBOARD ══════════════ -->
-<section id="view-admin" class="hidden">
+<div id="qr-modal" class="hidden fade" style="position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;">
+  <div style="background:var(--surface);padding:2.5rem 2rem;border-radius:var(--rh);text-align:center;border:1px solid var(--border);position:relative;width:min(340px,92vw);">
+    <button onclick="closeQRModal()" style="position:absolute;top:1rem;right:1rem;background:none;color:var(--muted);font-size:1.3rem;border:none;"><i class="fa-solid fa-xmark"></i></button>
+    <div style="width:50px;height:50px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;margin:0 auto 1rem;">
+      <i class="fa-solid fa-qrcode"></i>
+    </div>
+    <h3 style="font-family:var(--font-h);font-size:1.3rem;margin-bottom:.5rem;color:var(--text);font-weight:800;">Código de Acceso</h3>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;">Escanea este código para entrar a la plataforma del monumento.</p>
+    
+    <div id="qr-container" style="background:#fff;padding:1rem;border-radius:12px;display:inline-block;box-shadow:0 10px 25px rgba(0,0,0,0.5);"></div>
+    
+    <button onclick="descargarQR()" class="btn-primary" style="margin-top:1.5rem;width:100%;">
+      <i class="fa-solid fa-download"></i>&ensp;Descargar para Imprimir
+    </button>
+  </div>
+</div>
 
-  <!-- SIDEBAR -->
+<section id="view-admin" class="hidden">
   <aside class="admin-sidebar" id="admin-sidebar">
     <div class="admin-sidebar-logo">
       <div style="width:32px;height:32px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#fff"><i class="fa-solid fa-chart-line"></i></div>
@@ -622,12 +690,12 @@ input,select,textarea{font-family:var(--font-b);outline:none}
       <div class="nav-item" onclick="showAdminTab('content',this)"><i class="fa-solid fa-photo-film"></i> Contenido</div>
       <div class="nav-item" onclick="showAdminTab('upload',this)"><i class="fa-solid fa-upload"></i> Subir Media</div>
       <div class="nav-item" onclick="showAdminTab('visits',this)"><i class="fa-solid fa-users"></i> Visitantes</div>
+      <div class="nav-item" onclick="openQRModal()"><i class="fa-solid fa-qrcode"></i> Generar QR</div>
     </nav>
     <div class="sidebar-sep"></div>
     <div class="nav-item" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</div>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
     <div class="admin-topbar">
       <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
@@ -636,69 +704,70 @@ input,select,textarea{font-family:var(--font-b);outline:none}
     </div>
 
     <div class="admin-main" id="admin-main">
-
-      <!-- ─── TAB: ESTADÍSTICAS ─── -->
       <div id="tab-stats">
-        <!-- Simulador -->
+        
         <div class="sim-box">
-          <label>Simulador de visitas (proyección)</label>
-          <div class="sim-row">
-            <input class="sim-input" type="number" id="sim-n" placeholder="Ej: 5000">
-            <button class="sim-btn" onclick="simularDatos()">Proyectar</button>
+          <label class="sim-title"><i class="fa-solid fa-sliders"></i> Simulador de Ingreso Manual</label>
+          <div class="sim-grid">
+            <div class="sim-field"><label>Menor de 18</label><input class="sim-input" type="number" id="sim-edad-1" placeholder="Ej: 150" min="0"></div>
+            <div class="sim-field"><label>18 a 25</label><input class="sim-input" type="number" id="sim-edad-2" placeholder="Ej: 450" min="0"></div>
+            <div class="sim-field"><label>26 a 35</label><input class="sim-input" type="number" id="sim-edad-3" placeholder="Ej: 320" min="0"></div>
+            <div class="sim-field"><label>36 a 45</label><input class="sim-input" type="number" id="sim-edad-4" placeholder="Ej: 180" min="0"></div>
+            <div class="sim-field"><label>46 a 60</label><input class="sim-input" type="number" id="sim-edad-5" placeholder="Ej: 100" min="0"></div>
+            <div class="sim-field"><label>Mayor de 60</label><input class="sim-input" type="number" id="sim-edad-6" placeholder="Ej: 45" min="0"></div>
           </div>
+          <button class="sim-btn" onclick="simularDatosAvanzado()" style="margin-top: 1.5rem; width: 100%;"><i class="fa-solid fa-bolt"></i> Actualizar Estadísticas</button>
         </div>
 
-        <!-- KPIs -->
-        <div class="kpi-grid">
+        <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
           <div class="kpi-card"><div class="kpi-label">Total Visitas</div><div class="kpi-value accent" id="k-total">0</div></div>
-          <div class="kpi-card"><div class="kpi-label">Media Edad</div><div class="kpi-value" id="k-media">0</div><div class="kpi-sub">años (aprox.)</div></div>
-          <div class="kpi-card"><div class="kpi-label">Mediana</div><div class="kpi-value" id="k-mediana" style="font-size:1rem;margin-top:.25rem">—</div></div>
-          <div class="kpi-card"><div class="kpi-label">Moda Edad</div><div class="kpi-value" id="k-moda" style="font-size:1rem;margin-top:.25rem">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Visitas Monumento</div><div class="kpi-value" id="k-monumento">0</div></div>
+          <div class="kpi-card"><div class="kpi-label">Media Edad</div><div class="kpi-value" id="k-media">0</div><div class="kpi-sub">años</div></div>
+          <div class="kpi-card"><div class="kpi-label">Mediana Edad</div><div class="kpi-value" id="k-mediana" style="font-size:1.2rem;margin-top:.25rem">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Moda Edad</div><div class="kpi-value" id="k-moda" style="font-size:1.1rem;margin-top:.25rem">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Origen (Moda)</div><div class="kpi-value" id="k-moda-proc" style="font-size:0.9rem;margin-top:.25rem">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Perfil (Moda)</div><div class="kpi-value" id="k-moda-tipo" style="font-size:1.1rem;margin-top:.25rem">—</div></div>
         </div>
 
-        <!-- TABS internos -->
         <div class="admin-tabs">
-          <button class="admin-tab active" onclick="switchInnerTab('graficos',this)">Gráficos</button>
-          <button class="admin-tab" onclick="switchInnerTab('tablas',this)">Tablas</button>
-          <button class="admin-tab" onclick="switchInnerTab('cruce',this)">Cruce Variables</button>
+          <button class="admin-tab active" onclick="switchInnerTab('graficos',this)">Gráficos Visuales</button>
+          <button class="admin-tab" onclick="switchInnerTab('tablas',this)">Tablas de Frecuencia</button>
+          <button class="admin-tab" onclick="switchInnerTab('cruce',this)">Cruce de Variables</button>
         </div>
 
-        <!-- SUB: Gráficos -->
         <div id="inner-graficos">
           <div class="chart-card">
-            <div class="chart-title">Histograma · Frecuencia por Edades</div>
+            <div class="chart-title"><i class="fa-solid fa-chart-column"></i> Histograma · Frecuencia por Edades</div>
             <div class="chart-wrap"><canvas id="chart-edades"></canvas></div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">Distribución de Procedencia</div>
+            <div class="chart-title"><i class="fa-solid fa-chart-pie"></i> Distribución de Procedencia</div>
             <div class="chart-wrap"><canvas id="chart-proc"></canvas></div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">Perfil de Visitante</div>
+            <div class="chart-title"><i class="fa-solid fa-chart-bar"></i> Perfil de Visitante</div>
             <div class="chart-wrap"><canvas id="chart-tipo"></canvas></div>
           </div>
         </div>
 
-        <!-- SUB: Tablas -->
         <div id="inner-tablas" class="hidden">
           <div class="chart-card">
-            <div class="chart-title">Tabla de Frecuencias · Tipo Visitante</div>
+            <div class="chart-title"><i class="fa-solid fa-table"></i> Tabla de Frecuencias · Tipo Visitante</div>
             <table class="freq-table"><thead><tr><th>Clase (Xi)</th><th>fi</th><th>hi</th><th>%</th></tr></thead>
               <tbody id="tbl-tipo"></tbody></table>
           </div>
           <div class="chart-card" style="margin-top:.75rem">
-            <div class="chart-title">Tabla de Frecuencias · Procedencia</div>
+            <div class="chart-title"><i class="fa-solid fa-table"></i> Tabla de Frecuencias · Procedencia</div>
             <table class="freq-table"><thead><tr><th>Clase (Xi)</th><th>fi</th><th>hi</th><th>%</th></tr></thead>
               <tbody id="tbl-proc"></tbody></table>
           </div>
           <div class="chart-card" style="margin-top:.75rem">
-            <div class="chart-title">Tabla de Frecuencias · Edad</div>
+            <div class="chart-title"><i class="fa-solid fa-table"></i> Tabla de Frecuencias · Edad</div>
             <table class="freq-table"><thead><tr><th>Clase (Xi)</th><th>fi</th><th>hi</th><th>%</th></tr></thead>
               <tbody id="tbl-edad"></tbody></table>
           </div>
         </div>
 
-        <!-- SUB: Cruce -->
         <div id="inner-cruce" class="hidden">
           <div class="cruce-tabs">
             <button class="cruce-tab active" onclick="switchCruce('ep',this)">Edad × Proc.</button>
@@ -709,21 +778,19 @@ input,select,textarea{font-family:var(--font-b);outline:none}
             <div class="chart-wrap" style="height:260px"><canvas id="chart-cruce"></canvas></div>
           </div>
         </div>
-      </div><!-- /tab-stats -->
-
-      <!-- ─── TAB: CONTENIDO ─── -->
+      </div>
+      
       <div id="tab-content" class="hidden">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
           <span style="font-size:.8rem;color:var(--muted)" id="posts-count">0 publicaciones</span>
-          <button class="sim-btn" style="padding:.5rem .9rem;font-size:.8rem" onclick="showAdminTab('upload',document.querySelector('.nav-item:nth-child(3))'))">+ Nueva</button>
+          <button class="sim-btn" style="padding:.5rem .9rem;font-size:.8rem; box-shadow:none;" onclick="showAdminTab('upload',document.querySelector('.nav-item:nth-child(3)'))">+ Nueva</button>
         </div>
         <div id="admin-posts-list"><div class="post-loading"><div class="spinner"></div></div></div>
       </div>
 
-      <!-- ─── TAB: SUBIR MEDIA ─── -->
       <div id="tab-upload" class="hidden">
         <div class="chart-card">
-          <div class="chart-title">Nueva Publicación</div>
+          <div class="chart-title"><i class="fa-solid fa-plus"></i> Nueva Publicación</div>
           <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
             <input type="file" id="file-input" accept="image/*,video/*" onchange="handleFileSelect(this)">
             <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
@@ -732,62 +799,105 @@ input,select,textarea{font-family:var(--font-b);outline:none}
           <div id="upload-preview" class="hidden" style="margin-bottom:1rem"></div>
           <div class="progress-bar hidden" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
-          <div class="field"><label>Título de la publicación</label><input type="text" id="up-titulo" placeholder="Ej: Detalle de la escultura" style="width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:.75rem 1rem"></div>
-          <div class="field"><label>Descripción</label><textarea id="up-desc" rows="3" placeholder="Escribe una descripción…" style="width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:.75rem 1rem;resize:none;font-size:.9rem"></textarea></div>
+          <div class="field"><label>Título de la publicación</label><input type="text" id="up-titulo" placeholder="Ej: Detalle de la escultura" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.75rem 1rem"></div>
+          <div class="field"><label>Descripción</label><textarea id="up-desc" rows="3" placeholder="Escribe una descripción…" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.75rem 1rem;resize:none;font-size:.9rem"></textarea></div>
           <div class="field">
             <label>Tipo de contenido</label>
-            <select id="up-tipo" style="width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:.75rem 1rem;appearance:none">
+            <select id="up-tipo" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:.75rem 1rem;appearance:none">
               <option value="foto">📷 Fotografía</option>
-              <option value="video">🎬 Video</option>
-              <option value="info">📋 Información histórica</option>
+              <option value="video">🎬 Video (Feed Para Ti)</option>
+              <option value="info">📋 Información (Feed Para Ti)</option>
+              <option value="historia" style="color: var(--gold); font-weight: bold;">📜 Video Narrado (Pestaña Historia)</option>
             </select>
           </div>
-          <button class="btn-primary" id="btn-upload" onclick="uploadPost()" style="margin-top:.5rem">
-            <i class="fa-solid fa-paper-plane"></i>&ensp;Publicar en el Feed
+          <button class="sim-btn" id="btn-upload" onclick="uploadPost()" style="margin-top:1rem; width:100%;">
+            <i class="fa-solid fa-paper-plane"></i>&ensp;Publicar
           </button>
           <p id="upload-status" style="font-size:.8rem;color:var(--accent2);text-align:center;margin-top:.75rem"></p>
         </div>
       </div>
 
-      <!-- ─── TAB: VISITANTES ─── -->
       <div id="tab-visits" class="hidden">
-        <div class="chart-card" style="margin-bottom:.75rem">
-          <div class="chart-title">Registro de Visitantes (Tiempo Real)</div>
-          <div class="visits-table">
-            <div class="vt-row vt-header"><span>Edad</span><span>Procedencia</span><span>Tipo</span><span></span></div>
-            <div id="visits-body"><div class="post-loading" style="height:80px"><div class="spinner"></div></div></div>
+        <div class="chart-card" style="margin-bottom:.75rem; padding: 1.5rem 0;">
+          <div class="chart-title" style="padding: 0 1.5rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <i class="fa-solid fa-users"></i> Registro de Visitas (Tiempo Real)
+          </div>
+          
+          <div class="visits-table" style="border: none; border-radius: 0; box-shadow: none;">
+            <div class="vt-row vt-header">
+              <span>Fecha</span>
+              <span>Hora</span>
+              <span>Monumento</span>
+              <span>Edad</span>
+              <span>Procedencia</span>
+              <span>Perfil</span>
+              <span></span>
+            </div>
+            
+            <div id="visits-body">
+              <div class="post-loading" style="height:100px"><div class="spinner"></div></div>
+            </div>
           </div>
         </div>
       </div>
 
-    </div><!-- /admin-main -->
+    </div>
   </div>
 </section>
 
-<!-- ══════════════ SCRIPTS PRINCIPALES ══════════════ -->
 <script>
 /* ════════════════════════════════════════
-   DATOS EN MEMORIA (fallback sin Firebase)
+   DATOS EN MEMORIA Y LOCALSTORAGE
 ════════════════════════════════════════ */
-window.DB = {
+const defaultData = {
   total: 1245,
   edades:{'Menor de 18':150,'18 a 25':450,'26 a 35':320,'36 a 45':180,'46 a 60':100,'Mayor de 60':45},
-  procedencia:{'Riohacha':560,'La Guajira':311,'Colombia':249,'Extranjero':125},
+  procedencia:{'Riohacha':560,'Otro municipio de La Guajira':311,'Otro departamento de Colombia':249,'Extranjero':125},
   tipo:{'Turista':500,'Residente':400,'Estudiante':250,'Investigador':45,'Otro':50},
   visits:[],
   posts:[]
 };
 
-// Posts de ejemplo (se mezclan con los de Firebase)
+const savedBase = localStorage.getItem('simulated_base_db');
+if (savedBase) {
+  window.BASE_DB = JSON.parse(savedBase);
+} else {
+  window.BASE_DB = JSON.parse(JSON.stringify(defaultData));
+}
+
+window.DB = JSON.parse(JSON.stringify(window.BASE_DB));
+window.currentVisitorId = null; 
+
 window.DB.posts = [
-  {id:'d1',titulo:'Monumento a la Identidad',desc:'Símbolo del mestizaje y las raíces de La Guajira. Una fusión perfecta entre la herencia wayuu y la historia colonial de Riohacha. 🌵✨',tipo:'info',mediaUrl:null,autor:'@RioCultura',año:'1990',likes:1240,ts:Date.now()-86400000},
+  {
+    id: 'h1',
+    titulo: 'La Historia de Nuestro Monumento',
+    desc: 'Documental narrado sobre la fundación de Riohacha y el diseño del monumento por Yino Márquez.',
+    tipo: 'historia',
+    mediaUrl: './identidad.mp4', 
+    autor: '@Admin',
+    año: '2011',
+    likes: 3450,
+    ts: Date.now()
+  },
+  {
+    id: 'd1',
+    titulo: 'Monumento a la Identidad',
+    desc: 'Símbolo del mestizaje y las raíces de La Guajira. Una fusión perfecta entre la herencia wayuu y la historia colonial de Riohacha. 🌵✨',
+    tipo: 'foto', 
+    mediaUrl: './monumento.jpeg', 
+    autor: '@RioCultura',
+    año: '2011',
+    likes: 1240,
+    ts: Date.now() - 86400000
+  }
 ];
 
 /* ════════════════════════════════════
-   FORMULARIO VISITANTE
+   FORMULARIO VISITANTE (INGRESO)
 ════════════════════════════════════ */
-document.getElementById('visitor-form').addEventListener('submit', async e=>{
-  e.preventDefault();
+document.getElementById('visitor-form').addEventListener('submit', e => {
+  e.preventDefault(); 
   const btn = document.getElementById('btn-enter');
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>&ensp;Guardando…';
@@ -797,68 +907,136 @@ document.getElementById('visitor-form').addEventListener('submit', async e=>{
   const tipo = document.getElementById('f-tipo').value;
   const ts   = new Date();
 
-  const record = {edad,procedencia:proc,tipo_visitante:tipo,
-    monumento:'Identidad',fecha:ts.toLocaleDateString('es-CO'),
-    hora:ts.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})};
+  const record = { edad, procedencia:proc, tipo_visitante:tipo, monumento:'Identidad', 
+                   fecha:ts.toLocaleDateString('es-CO'), hora:ts.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit', hour12: true}),
+                   estado: 'activo' };
 
-  // Guardar en Firebase (no bloquea si falla)
-  if(window._fbReady){
-    try{
-      const {db,collection,addDoc,serverTimestamp} = window._fb;
-      await addDoc(collection(db,'visitantes'), {...record, timestamp: serverTimestamp()});
-    }catch(err){console.warn('Firebase write error:',err)}
-  }
-
-  // Actualizar datos locales — sin errores
   DB.total++;
   if(DB.edades[edad]  !== undefined) DB.edades[edad]++;
   if(DB.procedencia[proc] !== undefined) DB.procedencia[proc]++;
   if(DB.tipo[tipo]    !== undefined) DB.tipo[tipo]++; else DB.tipo[tipo]=1;
-  DB.visits.unshift(record);
 
-  // Ir al feed siempre, con o sin Firebase
   document.getElementById('view-form').classList.add('hidden');
   document.getElementById('view-feed').classList.remove('hidden');
+  
+  const perfilPrincipal = Object.keys(DB.tipo).reduce((a, b) => DB.tipo[a] > DB.tipo[b] ? a : b);
+  document.getElementById('public-total-visits').innerText = DB.total.toLocaleString();
+  document.getElementById('public-top-profile').innerText = perfilPrincipal;
+  
+  const banner = document.getElementById('public-stats-banner');
+  banner.style.display = 'flex';
+  banner.style.opacity = '1';
+  setTimeout(() => { banner.style.opacity = '0'; setTimeout(()=>banner.style.display='none', 500); }, 8000);
+
   loadFeed();
   btn.disabled=false;
   btn.innerHTML='<i class="fa-solid fa-arrow-right"></i>&ensp;Explorar el Monumento';
   e.target.reset();
+
+  if(window._fbReady){
+    const {db,collection,addDoc,serverTimestamp} = window._fb;
+    addDoc(collection(db,'visitantes'), {...record, timestamp: serverTimestamp()})
+      .then(docRef => {
+        window.currentVisitorId = docRef.id; 
+      })
+      .catch(err => console.warn('Firebase write error:', err));
+  } else {
+    record.id = 'v_' + Date.now();
+    window.currentVisitorId = record.id;
+    DB.visits.unshift(record);
+  }
 });
 
+function marcarDesconectado() {
+  if(window.currentVisitorId) {
+    if(window._fbReady) {
+      const {db, doc, updateDoc} = window._fb;
+      updateDoc(doc(db, 'visitantes', window.currentVisitorId), { estado: 'historial' })
+        .catch(err => console.log('Salida rápida', err));
+    } else {
+      const visitor = DB.visits.find(v => v.id === window.currentVisitorId);
+      if(visitor) visitor.estado = 'historial';
+    }
+  }
+}
+
+window.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') marcarDesconectado();
+});
+window.addEventListener('pagehide', marcarDesconectado);
+window.addEventListener('beforeunload', marcarDesconectado);
+
 /* ════════════════════════════════════
-   FEED — CARGA DE POSTS
+   FEED — CARGA CON CORTACIRCUITOS
 ════════════════════════════════════ */
 let feedLoaded = false;
+let feedTimeout;
+let currentFeedTab = 'feed'; 
+window.ALL_POSTS = []; 
+
 function loadFeed(){
   if(feedLoaded) return;
   feedLoaded = true;
 
+  let firebaseResponded = false;
+
+  feedTimeout = setTimeout(() => {
+    if (!firebaseResponded) {
+      console.warn("⏱️ Firebase tardó demasiado en responder. Cargando publicaciones locales por seguridad...");
+      renderFeed(DB.posts);
+    }
+  }, 3000); 
+
   if(window._fbReady){
     const {db,collection,query,orderBy,onSnapshot} = window._fb;
     const q = query(collection(db,'posts'), orderBy('timestamp','desc'));
-    onSnapshot(q, snap=>{
-      const remotePosts = [];
-      snap.forEach(d=>remotePosts.push({id:d.id,...d.data()}));
-      renderFeed([...remotePosts, ...DB.posts.filter(p=>!remotePosts.find(r=>r.id===p.id))]);
-    });
+    
+    onSnapshot(q, 
+      (snap) => {
+        firebaseResponded = true;
+        clearTimeout(feedTimeout);
+        const remotePosts = [];
+        snap.forEach(d=>remotePosts.push({id:d.id,...d.data()}));
+        renderFeed([...remotePosts, ...DB.posts.filter(p=>!remotePosts.find(r=>r.id===p.id))]);
+      }, 
+      (error) => {
+        firebaseResponded = true;
+        clearTimeout(feedTimeout);
+        console.warn('⚠️ Firebase bloqueó la lectura de posts:', error.message);
+        renderFeed(DB.posts); 
+      }
+    );
   } else {
+    firebaseResponded = true;
+    clearTimeout(feedTimeout);
     renderFeed(DB.posts);
   }
 }
 
 function renderFeed(posts){
+  window.ALL_POSTS = posts; 
+  
   const scroll = document.getElementById('posts-scroll');
   scroll.innerHTML = '';
-  if(!posts.length){
-    scroll.innerHTML = '<div class="post-loading"><i class="fa-solid fa-image" style="font-size:2rem;color:var(--muted)"></i><span style="color:var(--muted)">Sin publicaciones aún</span></div>';
+
+  let filteredPosts = [];
+  if (currentFeedTab === 'historia') {
+    filteredPosts = posts.filter(p => p.tipo === 'historia');
+  } else {
+    filteredPosts = posts.filter(p => p.tipo !== 'historia');
+  }
+
+  if(!filteredPosts.length){
+    scroll.innerHTML = '<div class="post-loading"><i class="fa-solid fa-film" style="font-size:2rem;color:var(--muted)"></i><span style="color:var(--muted)">Próximamente: Documental del Monumento</span></div>';
     return;
   }
-  posts.forEach((p,i)=>{
-    const isVideo = p.tipo==='video' || (p.mediaUrl && p.mediaUrl.includes('.mp4'));
+
+  filteredPosts.forEach((p,i)=>{
+    const isVideo = p.tipo==='video' || p.tipo==='historia' || (p.mediaUrl && p.mediaUrl.includes('.mp4'));
     let mediaHtml = '';
     if(p.mediaUrl){
       mediaHtml = isVideo
-        ? `<video class="post-media" src="${p.mediaUrl}" autoplay loop muted playsinline></video>`
+        ? `<video class="post-media" src="${p.mediaUrl}" autoplay loop muted playsinline controls></video>`
         : `<img class="post-media" src="${p.mediaUrl}" alt="${p.titulo||''}" loading="${i===0?'eager':'lazy'}">`;
     } else {
       mediaHtml = `<div class="post-media-placeholder"><i class="fa-solid fa-monument"></i></div>`;
@@ -878,7 +1056,7 @@ function renderFeed(posts){
           <div class="act-icon ai-btn"><i class="fa-solid fa-robot"></i></div>
           <span class="act-count">IA Guía</span>
         </div>
-        <div class="act-btn">
+        <div class="act-btn" onclick="sharePost('${p.id}')">
           <div class="act-icon"><i class="fa-solid fa-share-nodes"></i></div>
           <span class="act-count">Compartir</span>
         </div>
@@ -891,21 +1069,23 @@ function renderFeed(posts){
           ${p.año?`<span class="post-tag"><i class="fa-solid fa-calendar"></i> ${p.año}</span>`:''}
           <span class="post-tag">#Riohacha</span>
           <span class="post-tag">#LaGuajira</span>
-          ${p.tipo==='video'?'<span class="post-tag"><i class="fa-solid fa-film"></i> Video</span>':''}
+         ${p.tipo==='historia'?`<span class="post-tag" style="background:var(--gold);color:#000;cursor:pointer;transition:transform 0.1s;" onclick="narrarHistoria('${p.id}', this)" onactive="this.style.transform='scale(0.95)'"><i class="fa-solid fa-volume-high"></i> Escuchar Historia</span>`:''}
         </div>
       </div>`;
     scroll.appendChild(div);
   });
-  // Play video en primer post
+  
   const firstVid = scroll.querySelector('video');
   if(firstVid) firstVid.play().catch(()=>{});
 }
 
 function fmt(n){return n>=1000?(n/1000).toFixed(1)+'K':n}
 
-function switchFeedTab(tab,el){
+function switchFeedTab(tab, el){
   document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
+  currentFeedTab = tab;
+  renderFeed(window.ALL_POSTS); 
 }
 
 function likePost(el,id){
@@ -917,16 +1097,28 @@ function likePost(el,id){
   count.innerText = fmt(liked ? Math.max(0,n-1) : n+1);
 }
 
-/* ════════════════════════════════════
-   CHAT IA — ANTHROPIC API
-════════════════════════════════════ */
-const SYSTEM_PROMPT = `Eres la guía virtual inteligente del "Monumento a la Identidad" ubicado en Riohacha, La Guajira, Colombia. 
-Conoces todo sobre este monumento: fue creado en 1990, simboliza el mestizaje cultural entre las comunidades wayuu, afrocolombianas y europeas de La Guajira.
-Responde en español, de forma amable, concisa y culturalmente respetuosa. Máximo 3 oraciones por respuesta.
-Si preguntan por estadísticas, menciona los datos: los visitantes son mayoritariamente jóvenes de 18-25 años, predominan los residentes de Riohacha, y el grupo mayoritario es turistas.
-Ante preguntas fuera del tema del monumento o Riohacha, redirige amablemente.`;
+function sharePost(id) {
+  const post = window.ALL_POSTS.find(p => p.id === id);
+  if(!post) return;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: post.titulo || 'Monumento a la Identidad',
+      text: 'Mira esta publicación sobre el Monumento a la Identidad en Riohacha: ' + (post.desc || ''),
+      url: window.location.href
+    }).catch(err => console.warn('Usuario canceló el compartir', err));
+  } else {
+    navigator.clipboard.writeText(window.location.href);
+    alert('¡Enlace de la aplicación copiado al portapapeles para compartir!');
+  }
+}
 
-let chatHistory = [];
+/* ═════ CHAT IA — ENDPOINT DINÁMICO ═════ */
+const GROQ_KEY = "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"; 
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+let chatHistory = []; 
+
 async function sendChat(){
   const input = document.getElementById('chat-input');
   const msgs  = document.getElementById('chat-messages');
@@ -934,10 +1126,8 @@ async function sendChat(){
   if(!text) return;
 
   input.value = '';
-  // Mensaje usuario
   msgs.innerHTML += `<div class="msg-row user"><div class="msg-bubble">${escHtml(text)}</div></div>`;
 
-  // Typing indicator
   const typingId = 'typing-'+Date.now();
   msgs.innerHTML += `<div class="msg-row ai" id="${typingId}">
     <div class="msg-avatar"><i class="fa-solid fa-robot" style="font-size:.85rem"></i></div>
@@ -945,34 +1135,73 @@ async function sendChat(){
   </div>`;
   msgs.scrollTop = msgs.scrollHeight;
 
-  chatHistory.push({role:'user', content:text});
+  const topEdad = Object.keys(DB.edades).reduce((a, b) => DB.edades[a] > DB.edades[b] ? a : b);
+  const topProc = Object.keys(DB.procedencia).reduce((a, b) => DB.procedencia[a] > DB.procedencia[b] ? a : b);
+  const topTipo = Object.keys(DB.tipo).reduce((a, b) => DB.tipo[a] > DB.tipo[b] ? a : b);
+  const totalVisitas = DB.total;
 
-  try{
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+  const DYNAMIC_PROMPT = `Rol y Personalidad:
+Eres la guía virtual experta del "Monumento a la Identidad" y una embajadora cultural, histórica, turística y folclórica de la ciudad de Riohacha y el departamento de La Guajira, Colombia. Tu tono es educativo, fascinante, amigable, respetuoso y épico. Bajo ninguna circunstancia debes usar emojis.
+
+Conocimiento Base Obligatorio y Enciclopédico:
+1. Monumento a la Identidad: Ubicado en la Avenida Primera de Riohacha frente al mar Caribe. Inaugurado en 2011. Obra del escultor Yino Márquez. Mide 9 metros. Simboliza el mestizaje (indígena, afro, europeo). Personajes: Mujer wayuu bailando la yonna, Almirante Padilla, José Manuel Goenaga y Luis Antonio "El Negro" Robles.
+2. José Prudencio Padilla: Máximo héroe naval de Colombia (1784-1828). Nacido en Camarones. Selló la independencia de la Gran Colombia en la Batalla del Lago de Maracaibo (1823). Fue fusilado injustamente en Bogotá.
+3. Riohacha y La Guajira: "Portal de Perlas". Destaca por la Cultura Wayuu, el Palabrero, el folclor Vallenato, Francisco el Hombre, la gastronomía (Friche), y destinos como el Cabo de la Vela, Punta Gallinas, y Manaure.
+
+Métricas en Tiempo Real:
+Actualmente el monumento registra ${totalVisitas.toLocaleString()} visitantes en nuestra base de datos. Rango de edad predominante: "${topEdad}". Procedencia principal: "${topProc}". Perfil mayoritario: "${topTipo}".
+
+Reglas Estrictas:
+- NUNCA alucines ni inventes fechas.
+- SOLO respondes preguntas relacionadas con La Guajira, Riohacha, Padilla, monumentos, turismo local y cultura Wayuu.
+- Muro de Fuego: Si te preguntan cosas fuera de tema (matemáticas, programación, política actual, otros países, etc.), responde: "Mi deber es proteger y difundir la historia de La Guajira y nuestros monumentos. Por favor, pregúntame sobre nuestro hermoso territorio."
+- Usa párrafos cortos (3-4 líneas) y **negritas** para resaltar fechas, nombres y lugares clave. NINGÚN EMOJI.`;
+
+  if(chatHistory.length === 0 || chatHistory[0].role !== 'system') {
+    chatHistory.unshift({ role: 'system', content: DYNAMIC_PROMPT });
+  } else {
+    chatHistory[0].content = DYNAMIC_PROMPT; 
+  }
+
+  chatHistory.push({ role: 'user', content: text });
+
+  try {
+    const res = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_KEY}`
+      },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system: SYSTEM_PROMPT,
-        messages: chatHistory
+        model: "llama-3.1-8b-instant", 
+        messages: chatHistory,
+        temperature: 0.5
       })
     });
+    
     const data = await res.json();
-    const reply = data.content?.[0]?.text || 'Lo siento, no pude procesar tu pregunta.';
-    chatHistory.push({role:'assistant', content:reply});
+
+    if (!res.ok) {
+      console.error("🔥 Error de Groq:", data);
+      throw new Error(data.error?.message || "Error en la petición a Groq");
+    }
+
+    const reply = data.choices[0].message.content;
+    
+    chatHistory.push({ role: 'assistant', content: reply });
 
     document.getElementById(typingId).remove();
     msgs.innerHTML += `<div class="msg-row ai fade">
       <div class="msg-avatar"><i class="fa-solid fa-robot" style="font-size:.85rem"></i></div>
       <div class="msg-bubble">${escHtml(reply)}</div>
     </div>`;
-  } catch(err){
+  } catch(err) {
     document.getElementById(typingId).remove();
     msgs.innerHTML += `<div class="msg-row ai">
       <div class="msg-avatar"><i class="fa-solid fa-robot" style="font-size:.85rem"></i></div>
-      <div class="msg-bubble" style="color:var(--muted)">Conecta la clave API de Anthropic para activar el chat IA. <a href="https://docs.anthropic.com" style="color:var(--accent)">Ver docs →</a></div>
+      <div class="msg-bubble" style="color:#f87171">Hubo un error de conexión con la IA. Revisa la consola (F12).</div>
     </div>`;
+    console.error('Groq Fetch Error:', err);
   }
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -981,9 +1210,7 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 function openChat(){document.getElementById('chat-panel').classList.add('open');document.getElementById('chat-backdrop').classList.add('open')}
 function closeChat(){document.getElementById('chat-panel').classList.remove('open');document.getElementById('chat-backdrop').classList.remove('open')}
 
-/* ════════════════════════════════════
-   ADMIN
-════════════════════════════════════ */
+/* ═════ ADMIN DASHBOARD LOGIC ═════ */
 function openAdminModal(){document.getElementById('admin-modal').classList.remove('hidden')}
 function closeAdminModal(){document.getElementById('admin-modal').classList.add('hidden')}
 
@@ -998,7 +1225,14 @@ function loginAdmin(e){
     document.getElementById('view-admin').classList.remove('hidden');
     document.getElementById('view-admin').style.display='flex';
     buildDashboard();
-    listenVisitors();
+    
+    // Al entrar al admin, forzamos la actualización de la tabla.
+    if(window._fbReady){
+        listenVisitors();
+    } else {
+        renderVisits(DB.visits);
+    }
+    
     listenAdminPosts();
   } else {
     document.getElementById('a-error').classList.remove('hidden');
@@ -1012,7 +1246,6 @@ function logoutAdmin(){
   document.getElementById('view-form').classList.remove('hidden');
   document.getElementById('a-user').value='';document.getElementById('a-pass').value='';
   feedLoaded=false;
-  // Destruir charts para evitar memory leak
   Object.values(window._charts||{}).forEach(c=>{try{c.destroy()}catch(e){}});
   window._charts={};
 }
@@ -1037,9 +1270,6 @@ function switchInnerTab(tab,el){
   el.classList.add('active');
 }
 
-/* ════════════════════════════════════
-   ESTADÍSTICAS
-════════════════════════════════════ */
 Chart.defaults.color='#888';
 Chart.defaults.borderColor='rgba(255,255,255,.06)';
 window._charts={};
@@ -1048,20 +1278,31 @@ function buildDashboard(){
   const d=DB, n=d.total;
   if(!n) return;
 
-  // KPIs
   const pm={'Menor de 18':15,'18 a 25':21.5,'26 a 35':30.5,'36 a 45':40.5,'46 a 60':53,'Mayor de 60':65};
   const media=(Object.entries(d.edades).reduce((s,[k,v])=>s+pm[k]*v,0)/n).toFixed(1);
-  document.getElementById('k-total').innerText=n.toLocaleString();
-  document.getElementById('k-media').innerText=media;
+  
+  document.getElementById('k-total').innerText = n.toLocaleString();
+  document.getElementById('k-media').innerText = media;
 
   const ord=['Menor de 18','18 a 25','26 a 35','36 a 45','46 a 60','Mayor de 60'];
-  let acc=0,mediana='—';
-  for(const r of ord){acc+=d.edades[r];if(acc>=n/2){mediana=r;break;}}
-  const moda=Object.entries(d.edades).reduce((a,b)=>b[1]>a[1]?b:a)[0];
-  document.getElementById('k-mediana').innerText=mediana;
-  document.getElementById('k-moda').innerText=moda;
+  let acc=0, mediana='—';
+  for(const r of ord){
+    acc+=d.edades[r];
+    if(acc>=n/2){mediana=r;break;}
+  }
+  
+  const moda = Object.entries(d.edades).reduce((a,b)=>b[1]>a[1]?b:a)[0];
+  const modaProc = Object.entries(d.procedencia).reduce((a,b)=>b[1]>a[1]?b:a)[0];
+  const modaTipo = Object.entries(d.tipo).reduce((a,b)=>b[1]>a[1]?b:a)[0];
 
-  // Histograma Edades
+  const visitasMonumento = d.visits ? d.visits.filter(v => v.monumento === 'Identidad').length : n;
+  document.getElementById('k-monumento').innerText = visitasMonumento > 0 ? visitasMonumento : n;
+
+  document.getElementById('k-mediana').innerText = mediana;
+  document.getElementById('k-moda').innerText = moda;
+  document.getElementById('k-moda-proc').innerText = modaProc;
+  document.getElementById('k-moda-tipo').innerText = modaTipo;
+
   rebuildChart('chart-edades',{
     type:'bar',
     data:{labels:ord,datasets:[{label:'Frecuencia',data:ord.map(k=>d.edades[k]),
@@ -1070,7 +1311,6 @@ function buildDashboard(){
       scales:{x:{ticks:{font:{size:10}}},y:{beginAtZero:true}}}
   });
 
-  // Donut Procedencia
   rebuildChart('chart-proc',{
     type:'doughnut',
     data:{labels:Object.keys(d.procedencia),datasets:[{data:Object.values(d.procedencia),
@@ -1078,7 +1318,6 @@ function buildDashboard(){
     options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}}}
   });
 
-  // Barras Tipo
   rebuildChart('chart-tipo',{
     type:'bar',
     data:{labels:Object.keys(d.tipo),datasets:[{label:'Visitantes',data:Object.values(d.tipo),
@@ -1162,53 +1401,146 @@ function buildCruce(tipo){
   });
 }
 
-function simularDatos(){
-  const n=parseInt(document.getElementById('sim-n').value);
-  if(!n||n<=0) return;
-  const factor=n/DB.total;
-  DB.total=n;
-  ['edades','procedencia','tipo'].forEach(cat=>{
-    for(let k in DB[cat]) DB[cat][k]=Math.round(DB[cat][k]*factor);
+function simularDatosAvanzado() {
+  const v1 = parseInt(document.getElementById('sim-edad-1').value) || 0;
+  const v2 = parseInt(document.getElementById('sim-edad-2').value) || 0;
+  const v3 = parseInt(document.getElementById('sim-edad-3').value) || 0;
+  const v4 = parseInt(document.getElementById('sim-edad-4').value) || 0;
+  const v5 = parseInt(document.getElementById('sim-edad-5').value) || 0;
+  const v6 = parseInt(document.getElementById('sim-edad-6').value) || 0;
+
+  const nuevoTotal = v1 + v2 + v3 + v4 + v5 + v6;
+
+  if (nuevoTotal === 0) {
+    alert("Debes ingresar al menos un valor mayor a 0 en alguna categoría.");
+    return;
+  }
+
+  const factor = nuevoTotal / DB.total;
+
+  DB.total = nuevoTotal;
+  DB.edades['Menor de 18'] = v1;
+  DB.edades['18 a 25'] = v2;
+  DB.edades['26 a 35'] = v3;
+  DB.edades['36 a 45'] = v4;
+  DB.edades['46 a 60'] = v5;
+  DB.edades['Mayor de 60'] = v6;
+
+  ['procedencia', 'tipo'].forEach(cat => {
+    let sumaParcial = 0;
+    let llaveMayor = null;
+    let valorMayor = -1;
+
+    for (let k in DB[cat]) {
+      DB[cat][k] = Math.round(DB[cat][k] * factor);
+      sumaParcial += DB[cat][k];
+      
+      if (DB[cat][k] > valorMayor) {
+        valorMayor = DB[cat][k];
+        llaveMayor = k;
+      }
+    }
+
+    const diferencia = nuevoTotal - sumaParcial;
+    if (diferencia !== 0 && llaveMayor) {
+      DB[cat][llaveMayor] += diferencia;
+    }
   });
+
+  window.BASE_DB = JSON.parse(JSON.stringify(window.DB));
+  localStorage.setItem('simulated_base_db', JSON.stringify(window.BASE_DB));
+
   buildDashboard();
+  document.querySelectorAll('.sim-input').forEach(input => input.value = '');
 }
 
-/* ════════════════════════════════════
-   FIREBASE REALTIME LISTENERS (ADMIN)
-════════════════════════════════════ */
+/* ════════ RENDERIZADO DE TABLA (TIPO IMAGEN) ════════ */
+// SOLUCIÓN: listener unificado y constante para actualizaciones en tiempo real
+let unsubscribeVisitors = null;
+
 function listenVisitors(){
-  const body=document.getElementById('visits-body');
   if(window._fbReady){
     const {db,collection,query,orderBy,onSnapshot}=window._fb;
     const q=query(collection(db,'visitantes'),orderBy('timestamp','desc'));
-    onSnapshot(q,snap=>{
+    
+    // Limpiamos listener previo para evitar múltiples conexiones
+    if (unsubscribeVisitors) unsubscribeVisitors();
+    
+    unsubscribeVisitors = onSnapshot(q, snap => {
       const rows=[];
-      snap.forEach(d=>rows.push(d.data()));
-      // Recalcular DB
-      DB.total=rows.length||DB.total;
+      snap.forEach(d=>rows.push({id: d.id, ...d.data()})); 
+      
+      // Recalcular base para no duplicar sumas
+      window.DB = JSON.parse(JSON.stringify(window.BASE_DB));
+      window.DB.total += rows.length;
+      window.DB.visits = rows; 
+      
       rows.forEach(r=>{
         if(r.edad&&DB.edades[r.edad]!==undefined) DB.edades[r.edad]++;
         if(r.procedencia&&DB.procedencia[r.procedencia]!==undefined) DB.procedencia[r.procedencia]++;
         if(r.tipo_visitante&&DB.tipo[r.tipo_visitante]!==undefined) DB.tipo[r.tipo_visitante]++;
       });
+      
       renderVisits(rows);
-      if(!document.getElementById('tab-stats').classList.contains('hidden')) buildDashboard();
+      
+      // Actualizamos gráficas si estamos en la pestaña correcta
+      if(!document.getElementById('tab-stats').classList.contains('hidden')) {
+          buildDashboard();
+      }
     });
   } else {
     renderVisits(DB.visits);
   }
 }
 
-function renderVisits(rows){
-  const body=document.getElementById('visits-body');
-  if(!rows.length){body.innerHTML='<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:.85rem">Sin registros aún</div>';return;}
-  body.innerHTML=rows.slice(0,50).map(r=>`
+function renderVisits(rows) {
+  const bodyHistory = document.getElementById('visits-body');
+
+  if (!rows.length) {
+    bodyHistory.innerHTML = '<div style="padding:2.5rem;text-align:center;color:var(--muted);font-size:.9rem">No hay registros de visitas en la base de datos todavía.</div>';
+    return;
+  }
+
+  bodyHistory.innerHTML = rows.map(r => `
     <div class="vt-row">
-      <span>${r.edad||'—'}</span>
-      <span>${r.procedencia||'—'}</span>
-      <span>${r.tipo_visitante||'—'}</span>
-      <div class="vt-dot"></div>
-    </div>`).join('');
+      <span class="vt-cell">${r.fecha || '-'}</span>
+      <span class="vt-cell">${r.hora || '-'}</span>
+      <span class="vt-cell" style="font-weight:600;">${r.monumento || 'Identidad'}</span>
+      <span class="vt-cell">${r.edad || '-'}</span>
+      <span class="vt-cell">${r.procedencia || '-'}</span>
+      <span class="vt-cell" style="color:var(--accent2); font-weight:700;">${r.tipo_visitante || '-'}</span>
+      
+      <button class="pac-btn danger" style="padding:4px 8px; font-size:0.75rem; justify-self:end; border:none; background:transparent;" onclick="deleteVisitor('${r.id}')" title="Eliminar registro">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+function deleteVisitor(id) {
+  if(!confirm('¿Estás seguro de eliminar a este visitante de la tabla? Las estadísticas se recalcularán automáticamente.')) return;
+  
+  if(window._fbReady){
+    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({doc,deleteDoc})=>{
+      deleteDoc(doc(window._fb.db,'visitantes',id)).catch(err => {
+        console.warn('Error al eliminar:', err);
+        alert('Hubo un error al eliminar el registro en la base de datos.');
+      });
+    });
+  } else {
+    DB.visits = DB.visits.filter(v => v.id !== id);
+    
+    window.DB = JSON.parse(JSON.stringify(window.BASE_DB));
+    window.DB.total += DB.visits.length;
+    DB.visits.forEach(r=>{
+      if(r.edad&&DB.edades[r.edad]!==undefined) DB.edades[r.edad]++;
+      if(r.procedencia&&DB.procedencia[r.procedencia]!==undefined) DB.procedencia[r.procedencia]++;
+      if(r.tipo_visitante&&DB.tipo[r.tipo_visitante]!==undefined) DB.tipo[r.tipo_visitante]++;
+    });
+    
+    renderVisits(DB.visits);
+    buildDashboard();
+  }
 }
 
 function listenAdminPosts(){
@@ -1231,11 +1563,11 @@ function renderAdminPosts(posts){
   document.getElementById('posts-count').innerText=`${posts.length} publicaciones`;
   const list=document.getElementById('admin-posts-list');
   list.innerHTML=posts.map(p=>{
-    const badge={foto:'badge-foto',video:'badge-video',info:'badge-info'}[p.tipo]||'badge-info';
-    const label={foto:'Foto',video:'Video',info:'Info'}[p.tipo]||'Info';
-    const thumb=p.mediaUrl&&p.tipo!=='video'
+    const badge={foto:'badge-foto',video:'badge-video',info:'badge-info',historia:'badge-info'}[p.tipo]||'badge-info';
+    const label={foto:'Foto',video:'Video',info:'Info',historia:'Historia'}[p.tipo]||'Info';
+    const thumb=p.mediaUrl&&p.tipo!=='video'&&p.tipo!=='historia'
       ?`<img class="pac-thumb" src="${p.mediaUrl}" alt="">`
-      :`<div class="pac-thumb"><i class="fa-solid fa-${p.tipo==='video'?'film':'circle-info'}"></i></div>`;
+      :`<div class="pac-thumb"><i class="fa-solid fa-${p.tipo==='video'||p.tipo==='historia'?'film':'circle-info'}"></i></div>`;
     return `<div class="post-admin-card">
       <div class="pac-header">
         ${thumb}
@@ -1255,7 +1587,6 @@ function renderAdminPosts(posts){
 
 function deletePost(id){
   if(!confirm('¿Eliminar esta publicación?')) return;
-  // Firebase delete
   if(window._fbReady){
     import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({doc,deleteDoc})=>{
       deleteDoc(doc(window._fb.db,'posts',id)).catch(console.warn);
@@ -1269,11 +1600,7 @@ function editPost(id){
   alert('Funcionalidad de edición: abre el post en la pestaña Subir Media (próximamente).');
 }
 
-/* ════════════════════════════════════
-   SUBIDA DE ARCHIVOS
-════════════════════════════════════ */
 let selectedFile=null;
-
 function handleFileSelect(input){
   selectedFile=input.files[0];
   if(!selectedFile) return;
@@ -1287,7 +1614,6 @@ function handleFileSelect(input){
   }
 }
 
-// Drag & Drop
 const dz=document.getElementById('drop-zone');
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover')});
 dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
@@ -1312,7 +1638,6 @@ async function uploadPost(){
 
   let mediaUrl=null;
 
-  // Subir archivo a Firebase Storage
   if(selectedFile && window._fbReady){
     try{
       const {storage,ref,uploadBytesResumable,getDownloadURL}=window._fb;
@@ -1344,7 +1669,6 @@ async function uploadPost(){
     timestamp:window._fbReady?window._fb.serverTimestamp():Date.now()
   };
 
-  // Guardar en Firestore
   if(window._fbReady){
     try{
       const {db,collection,addDoc}=window._fb;
@@ -1353,7 +1677,7 @@ async function uploadPost(){
       console.warn('Firestore write error:',err);
       status.innerText='⚠️ Error al guardar en Firestore.';
       status.style.color='#f87171';
-      btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-paper-plane"></i>&ensp;Publicar en el Feed';
+      btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-paper-plane"></i>&ensp;Publicar';
       return;
     }
   } else {
@@ -1369,30 +1693,124 @@ async function uploadPost(){
   selectedFile=null;
   document.getElementById('file-input').value='';
   btn.disabled=false;
-  btn.innerHTML='<i class="fa-solid fa-paper-plane"></i>&ensp;Publicar en el Feed';
+  btn.innerHTML='<i class="fa-solid fa-paper-plane"></i>&ensp;Publicar';
 }
 
-/* ════════════════════════════════════
-   TRIGGER ADMIN SECRET
-════════════════════════════════════ */
-// Ctrl+Shift+A
-document.addEventListener('keydown',e=>{
-  if(e.ctrlKey&&e.shiftKey&&e.key==='A') openAdminModal();
+// SOLUCIÓN: El evento de teclado ahora está configurado de manera central
+document.addEventListener('keydown', e => {
+  // El atajo Ctrl + Shift + A ahora abrirá el modal independientemente de dónde estés
+  if(e.ctrlKey && e.shiftKey && e.key === 'A') {
+      openAdminModal();
+  }
 });
-// Mantener presionado el logo 3s en móvil
 let holdTimer;
 const hold=document.getElementById('secret-hold');
 hold.addEventListener('touchstart',()=>{holdTimer=setTimeout(openAdminModal,3000)},{passive:true});
 hold.addEventListener('touchend',()=>clearTimeout(holdTimer));
 hold.addEventListener('touchmove',()=>clearTimeout(holdTimer));
 
-/* ════════════════════════════════════
-   FIREBASE READY → inicializar listener
-════════════════════════════════════ */
 window.addEventListener('firebase-ready',()=>{
-  // Los listeners se inician solo cuando el admin está activo
   console.log('Firebase listo, listeners en standby.');
 });
-</script>
+
+/* ═════ NARRADOR DE HISTORIA ═════ */
+function narrarHistoria(id, btnElement) {
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    btnElement.innerHTML = '<i class="fa-solid fa-volume-high"></i> Escuchar Historia';
+    return;
+  }
+
+  const relatoCompleto = `
+    El Monumento a la Identidad, inaugurado en el año 2011, es una majestuosa obra del reconocido escultor guajiro Yino Márquez. 
+    Ubicada aquí, en el hermoso Malecón de Riohacha frente al Mar Caribe, esta imponente estructura de 9 metros de altura 
+    está construida en bronce, hierro galvanizado y concreto. 
+
+    Este monumento es un tributo profundo a nuestro mestizaje. En la parte superior, destaca una mujer wayuu danzando la yonna, 
+    que representa nuestra herencia indígena ancestral y la fuerza vital de la mujer guajira. 
+
+    Acompañando a esta figura, encontramos a tres grandes personajes de nuestra historia: 
+    El Almirante José Prudencio Padilla, héroe máximo de nuestra independencia naval; 
+    el general José Manuel Goenaga; 
+    y el gran Luis Antonio "El Negro" Robles, ilustre abogado y primer afrocolombiano en llegar al Congreso de la República. 
+
+    Juntos, ellos simbolizan la unión perfecta de las raíces indígena, afrodescendiente y europea, 
+    tejiendo para siempre la identidad cultural, libre y valiente de La Guajira.
+  `;
+
+  const narracion = new SpeechSynthesisUtterance(relatoCompleto);
+  narracion.lang = 'es-CO'; 
+  narracion.rate = 0.95; 
+  narracion.pitch = 1.0; 
+
+  const vocesDisponibles = window.speechSynthesis.getVoices();
+  
+  const vozPremium = vocesDisponibles.find(voz => 
+    voz.name.includes('Google español') || 
+    voz.name.includes('Natural') || 
+    voz.name.includes('Microsoft Sabina') ||
+    voz.name.includes('Monica')
+  );
+
+  if (vozPremium) {
+    narracion.voice = vozPremium;
+  } else {
+    const vozEspañol = vocesDisponibles.find(voz => voz.lang.startsWith('es-'));
+    if (vozEspañol) narracion.voice = vozEspañol;
+  }
+
+  btnElement.innerHTML = '<i class="fa-solid fa-stop" style="color:#c53030"></i> Detener Relato';
+
+  narracion.onend = function() {
+    btnElement.innerHTML = '<i class="fa-solid fa-volume-high"></i> Escuchar Historia';
+  };
+
+  window.speechSynthesis.speak(narracion);
+}
+
+/* ═════ GENERADOR DE CÓDIGO QR ═════ */
+let qrCodeInstance = null;
+
+function openQRModal() {
+  const modal = document.getElementById('qr-modal');
+  const container = document.getElementById('qr-container');
+  
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+  
+  container.innerHTML = '';
+  
+  const urlActual = window.location.href.split('#')[0]; 
+  
+  qrCodeInstance = new QRCode(container, {
+    text: urlActual,
+    width: 220,
+    height: 220,
+    colorDark : "#0a0a0a",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+}
+
+function closeQRModal() {
+  const modal = document.getElementById('qr-modal');
+  modal.classList.add('hidden');
+  setTimeout(() => modal.style.display = '', 300);
+}
+
+function descargarQR() {
+  const qrCanvas = document.querySelector('#qr-container canvas');
+  if (qrCanvas) {
+    const enlace = document.createElement('a');
+    enlace.href = qrCanvas.toDataURL("image/png");
+    enlace.download = 'QR_Monumento_Identidad.png';
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+  } else {
+    alert("El código QR aún no se ha generado.");
+  }
+}
+</script> 
 </body>
 </html>
